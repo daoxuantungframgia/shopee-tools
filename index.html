@@ -7,7 +7,7 @@
     <style>
       body {
         font-family: 'Inter', Arial, sans-serif;
-        background-color: #f5f7fb;
+        background-color: #f4f6fa;
         color: #333;
         margin: 0;
         padding: 0;
@@ -110,12 +110,21 @@
       }
 
       .copy-btn {
-        background: #00c851;
+        background: #1a73e8;
         font-size: 13px;
       }
 
       .copy-btn:hover {
-        background: #009e42;
+        background: #155fc5;
+      }
+
+      .copied {
+        background: #00c851 !important;
+        cursor: default !important;
+      }
+
+      .copied:hover {
+        background: #00c851 !important;
       }
 
       @media (max-width: 600px) {
@@ -123,9 +132,7 @@
           flex-direction: column;
           align-items: flex-start;
         }
-        input[type='number'] {
-          width: 100%;
-        }
+        input[type='number'],
         button {
           width: 100%;
         }
@@ -186,15 +193,19 @@
           output.appendChild(box);
         }
 
-        // Copy button
+        // Copy button logic
         document.querySelectorAll('.copy-btn').forEach((btn) => {
-          btn.addEventListener('click', (e) => {
-            const textToCopy = e.target
-              .closest('.group-box')
-              .querySelector('.group-links').innerText;
-            navigator.clipboard.writeText(textToCopy);
-            btn.innerText = '✅ Đã Copy';
-            setTimeout(() => (btn.innerText = 'Copy'), 1500);
+          btn.addEventListener('click', async (e) => {
+            const box = e.target.closest('.group-box');
+            const textToCopy = box.querySelector('.group-links').innerText;
+
+            try {
+              await navigator.clipboard.writeText(textToCopy);
+              btn.classList.add('copied');
+              btn.innerText = '✅ Đã Copy';
+            } catch (err) {
+              alert('❌ Trình duyệt không cho phép copy tự động.');
+            }
           });
         });
       });
