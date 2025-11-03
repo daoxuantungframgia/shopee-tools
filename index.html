@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chia Link Thành Nhóm</title>
+    <title>Chia Link Thành Nhóm (Lọc Trùng + Trộn Ngẫu Nhiên)</title>
     <style>
       body {
         font-family: "Inter", Arial, sans-serif;
@@ -141,7 +141,7 @@
   </head>
   <body>
     <div class="container">
-      <h1>🔗 Chia Link Thành Nhóm Tuỳ Số Lượng</h1>
+      <h1>🔗 Chia Link Thành Nhóm (Lọc Trùng + Trộn Ngẫu Nhiên)</h1>
 
       <label for="inputLinks">Danh sách link (mỗi link một dòng):</label>
       <textarea
@@ -177,18 +177,21 @@
           return;
         }
 
-        // 🔀 Bước 1: Trộn ngẫu nhiên cực mạnh (Fisher–Yates Shuffle)
+        // 🧹 Bước 1: Lọc bỏ trùng (unique)
+        links = [...new Set(links)];
+
+        // 🔀 Bước 2: Trộn ngẫu nhiên cực mạnh (Fisher–Yates)
         for (let i = links.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [links[i], links[j]] = [links[j], links[i]];
         }
 
-        // 🔁 Bước 2: Trộn thêm vài lần để đảo vị trí tối đa
+        // 🔁 Bước 3: Trộn thêm vài lần để tăng ngẫu nhiên
         for (let k = 0; k < 3; k++) {
           links.sort(() => Math.random() - 0.5);
         }
 
-        // 🧩 Bước 3: Chia nhóm
+        // 📦 Bước 4: Chia nhóm
         const totalGroups = Math.ceil(links.length / groupSize);
 
         for (let i = 0; i < totalGroups; i++) {
@@ -205,7 +208,7 @@
           output.appendChild(box);
         }
 
-        // 📋 Bước 4: Chức năng copy nhanh
+        // 📋 Bước 5: Chức năng copy nhanh
         document.querySelectorAll(".copy-btn").forEach((btn) => {
           btn.addEventListener("click", async (e) => {
             const box = e.target.closest(".group-box");
@@ -220,6 +223,14 @@
             }
           });
         });
+
+        // 🧾 Hiển thị thông báo tổng số link sau khi lọc
+        const info = document.createElement("p");
+        info.style.marginTop = "15px";
+        info.style.fontWeight = "600";
+        info.style.color = "#1a73e8";
+        info.innerText = `✅ Tổng: ${links.length} link (đã lọc trùng)`;
+        output.prepend(info);
       });
     </script>
   </body>
