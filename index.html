@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
@@ -155,6 +155,7 @@
           <input id="groupSize" type="number" value="1000" min="1" />
         </div>
         <button id="splitButton">Chia sản phẩm</button>
+        <button id="splitButton2">Chia sản phẩm không đảo</button>
       </div>
 
       <div id="output" class="output"></div>
@@ -162,6 +163,7 @@
 
     <script>
       const splitButton = document.getElementById("splitButton");
+      const splitButton2 = document.getElementById("splitButton2");
       const output = document.getElementById("output");
 
       splitButton.addEventListener("click", () => {
@@ -190,6 +192,64 @@
         for (let k = 0; k < 3; k++) {
           links.sort(() => Math.random() - 0.5);
         }
+
+        // 📦 Bước 4: Chia nhóm
+        const totalGroups = Math.ceil(links.length / groupSize);
+
+        for (let i = 0; i < totalGroups; i++) {
+          const chunk = links.slice(i * groupSize, (i + 1) * groupSize);
+          const box = document.createElement("div");
+          box.className = "group-box";
+          box.innerHTML = `
+            <div class="group-header">
+              <strong>Nhóm ${i + 1} (${chunk.length} link)</strong>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="group-links">${chunk.join("\n")}</div>
+          `;
+          output.appendChild(box);
+        }
+
+        // 📋 Bước 5: Chức năng copy nhanh
+        document.querySelectorAll(".copy-btn").forEach((btn) => {
+          btn.addEventListener("click", async (e) => {
+            const box = e.target.closest(".group-box");
+            const textToCopy = box.querySelector(".group-links").innerText;
+
+            try {
+              await navigator.clipboard.writeText(textToCopy);
+              btn.classList.add("copied");
+              btn.innerText = "✅ Đã Copy";
+            } catch (err) {
+              alert("❌ Trình duyệt không cho phép copy tự động.");
+            }
+          });
+        });
+
+        // 🧾 Hiển thị thông báo tổng số link sau khi lọc
+        const info = document.createElement("p");
+        info.style.marginTop = "15px";
+        info.style.fontWeight = "600";
+        info.style.color = "#1a73e8";
+        info.innerText = `✅ Tổng: ${links.length} link (đã lọc trùng)`;
+        output.prepend(info);
+      });
+
+      splitButton2.addEventListener("click", () => {
+        const text = document.getElementById("inputLinks").value.trim();
+        const groupSize =
+          parseInt(document.getElementById("groupSize").value) || 1000;
+        let links = text.split(/\r?\n/).filter((line) => line.trim() !== "");
+
+        output.innerHTML = "";
+
+        if (links.length === 0) {
+          alert("⚠️ Vui lòng nhập ít nhất 1 link!");
+          return;
+        }
+
+        // 🧹 Bước 1: Lọc bỏ trùng (unique)
+        links = [...new Set(links)];
 
         // 📦 Bước 4: Chia nhóm
         const totalGroups = Math.ceil(links.length / groupSize);
